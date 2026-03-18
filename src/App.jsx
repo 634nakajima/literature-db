@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import usePaperStore from './store/usePaperStore';
 import { EMPTY, toForm } from './lib/helpers';
+import PasswordGate from './components/layout/PasswordGate';
 import Header from './components/layout/Header';
 import TabNav from './components/layout/TabNav';
 import PaperList from './components/papers/PaperList';
@@ -66,6 +67,7 @@ export default function App() {
   };
 
   return (
+    <PasswordGate>
     <div className="min-h-screen bg-slate-50 text-slate-900 text-sm">
       <Header />
       <TabNav editMode={editMode} onResetForm={handleResetForm} />
@@ -107,5 +109,6 @@ export default function App() {
         {activeTab === 'import' && <ImportExportView />}
       </main>
     </div>
+    </PasswordGate>
   );
 }
