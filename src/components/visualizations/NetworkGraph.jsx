@@ -55,9 +55,9 @@ const cyStyle = [
     selector: 'edge',
     style: {
       width: 'data(weight)',
-      'line-color': '#94a3b8',
+      'line-color': '#e2e8f0',
       'curve-style': 'bezier',
-      opacity: 0.4,
+      opacity: 0.5,
     },
   },
   {
@@ -85,7 +85,7 @@ export default function NetworkGraph() {
   const allTags = useAllTags();
 
   const [filterTag, setFilterTag] = useState(null);
-  const [layout, setLayout] = useState('cose');
+  const [layout, setLayout] = useState('circle');
   const [tooltip, setTooltip] = useState(null);
   const tooltipRef = useRef(null);
 
