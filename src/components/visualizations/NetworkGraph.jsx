@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';
 import usePaperStore from '../../store/usePaperStore';
 import { useAllTags } from '../../hooks/usePaperData';
-import { buildNetworkElements, getTagColor } from '../../lib/graphUtils';
+import { buildNetworkElements, getTagColor, LAB_THEMES } from '../../lib/graphUtils';
 
 const cyStyle = [
   {
@@ -12,12 +12,12 @@ const cyStyle = [
       width: 'data(size)',
       height: 'data(size)',
       'background-color': 'data(color)',
-      'font-size': 7,
-      'text-wrap': 'ellipsis',
-      'text-max-width': 60,
+      'font-size': 6,
+      'text-wrap': 'wrap',
+      'text-max-width': 100,
       'text-valign': 'bottom',
-      'text-margin-y': 3,
-      color: '#64748b',
+      'text-margin-y': 4,
+      color: '#475569',
       'min-zoomed-font-size': 6,
       'border-width': 2,
       'border-color': 'data(color)',

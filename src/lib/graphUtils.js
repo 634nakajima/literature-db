@@ -1,12 +1,30 @@
-// Tag color palette
-const TAG_COLORS = [
+// Lab research themes (fixed categories)
+export const LAB_THEMES = [
+  'Multimodal/Crossmodal Affectivity',
+  'Enactive Affectivity',
+  'Digital Kineticism',
+  'Hapsonic Art',
+];
+
+// Color palette: lab themes get fixed colors, then dynamic for others
+const THEME_COLORS = {
+  'Multimodal/Crossmodal Affectivity': '#6366f1', // indigo
+  'Enactive Affectivity': '#ec4899',              // pink
+  'Digital Kineticism': '#14b8a6',                 // teal
+  'Hapsonic Art': '#f59e0b',                       // amber
+};
+
+const EXTRA_COLORS = [
   '#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c',
-  '#0891b2', '#c026d3', '#ca8a04', '#4f46e5', '#059669',
+  '#0891b2', '#c026d3', '#4f46e5', '#059669', '#ca8a04',
 ];
 
 export function getTagColor(tag, allTags) {
-  const idx = allTags.indexOf(tag);
-  return TAG_COLORS[idx % TAG_COLORS.length];
+  if (THEME_COLORS[tag]) return THEME_COLORS[tag];
+  // For non-theme tags, use extra colors
+  const nonThemeTags = allTags.filter(t => !THEME_COLORS[t]);
+  const idx = nonThemeTags.indexOf(tag);
+  return EXTRA_COLORS[idx >= 0 ? idx % EXTRA_COLORS.length : 0];
 }
 
 /**
@@ -20,18 +38,17 @@ export function buildNetworkElements(papers, filterTag = null) {
 
   const allTags = [...new Set(papers.flatMap(p => p.tags || []))].sort();
 
-  // Build nodes
+  // Build nodes - show full title (Cytoscape handles wrapping)
   const nodes = filtered.map(p => {
     const primaryTag = (p.tags || [])[0] || '';
     return {
       data: {
         id: p.id,
-        label: p.title.length > 30 ? p.title.slice(0, 30) + '…' : p.title,
-        fullTitle: p.title,
+        label: p.title,
         year: p.year,
         authors: p.authors,
         color: primaryTag ? getTagColor(primaryTag, allTags) : '#94a3b8',
-        size: 30, // will be updated based on degree
+        size: 30,
       },
     };
   });
@@ -59,7 +76,7 @@ export function buildNetworkElements(papers, filterTag = null) {
     }
   }
 
-  // Update node sizes based on degree (connection count)
+  // Update node sizes based on degree
   const degreeCounts = {};
   edges.forEach(e => {
     degreeCounts[e.data.source] = (degreeCounts[e.data.source] || 0) + 1;
@@ -75,10 +92,8 @@ export function buildNetworkElements(papers, filterTag = null) {
 
 /**
  * Build co-occurrence matrix for keywords.
- * Returns { keywords: string[], matrix: number[][] }
  */
 export function buildCooccurrenceMatrix(papers, topN = 15) {
-  // Count keyword frequencies
   const freq = {};
   papers.forEach(p => {
     (p.keywords || []).forEach(k => {
@@ -86,13 +101,11 @@ export function buildCooccurrenceMatrix(papers, topN = 15) {
     });
   });
 
-  // Get top N keywords by frequency
   const keywords = Object.entries(freq)
     .sort((a, b) => b[1] - a[1])
     .slice(0, topN)
     .map(([k]) => k);
 
-  // Build matrix
   const n = keywords.length;
   const matrix = Array.from({ length: n }, () => Array(n).fill(0));
 

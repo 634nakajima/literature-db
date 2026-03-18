@@ -35,7 +35,7 @@ export default function TimelineView() {
     return [Math.min(...years) - 1, Math.max(...years) + 1];
   }, [papersWithYear]);
 
-  const leftMargin = swimlane ? 110 : 40;
+  const leftMargin = swimlane ? 160 : 40;
   const margin = { top: 30, right: 30, bottom: 90, left: leftMargin };
   const innerWidth = containerWidth - margin.left - margin.right;
 
@@ -147,16 +147,16 @@ export default function TimelineView() {
                 {i > 0 && (
                   <line x1={0} y1={i * laneHeight - 5} x2={innerWidth} y2={i * laneHeight - 5} stroke="#e2e8f0" strokeDasharray="4,4" />
                 )}
-                <text x={-12} y={i * laneHeight + 25} textAnchor="end" fontSize={11} fill="#475569" fontWeight={600}>
-                  {lane}
+                <text x={-12} y={i * laneHeight + 25} textAnchor="end" fontSize={10} fill="#475569" fontWeight={600}>
+                  {lane.length > 20 ? lane.replace('Multimodal/', 'M/') : lane}
                 </text>
               </g>
             ))}
 
             {/* Paper dots */}
-            {positioned.map(({ paper, x, y, color }) => (
+            {positioned.map(({ paper, x, y, color, lane }, idx) => (
               <g
-                key={paper.id}
+                key={lane ? `${paper.id}-${lane}` : paper.id}
                 transform={`translate(${x}, ${y})`}
                 className="cursor-pointer"
                 onClick={() => handleClick(paper)}

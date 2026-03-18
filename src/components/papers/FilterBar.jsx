@@ -1,5 +1,6 @@
 import usePaperStore from '../../store/usePaperStore';
 import { useAllTags, useAllKeywords } from '../../hooks/usePaperData';
+import { LAB_THEMES, getTagColor } from '../../lib/graphUtils';
 
 export default function FilterBar() {
   const papers = usePaperStore(s => s.papers);
@@ -11,17 +12,52 @@ export default function FilterBar() {
   const allTags = useAllTags();
   const allKeywords = useAllKeywords();
 
-  const topKeywords = allKeywords.filter(k => k.count >= 2).slice(0, 10);
+  const topKeywords = allKeywords.filter(k => k.count >= 2).slice(0, 12);
+
+  // Separate lab themes and other tags
+  const labThemeTags = LAB_THEMES.filter(t => allTags.includes(t));
+  const otherTags = allTags.filter(t => !LAB_THEMES.includes(t));
 
   if (allTags.length === 0 && topKeywords.length === 0) return null;
 
   return (
     <div className="mb-5 bg-white/60 rounded-xl p-4 border border-slate-100">
-      {allTags.length > 0 && (
+      {/* Lab themes */}
+      {labThemeTags.length > 0 && (
+        <div className="mb-3">
+          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">
+            Research Themes
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {labThemeTags.map(t => {
+              const count = papers.filter(p => (p.tags || []).includes(t)).length;
+              const active = filterTag === t;
+              const color = getTagColor(t, allTags);
+              return (
+                <button
+                  key={t}
+                  onClick={() => setFilterTag(t)}
+                  className="text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-all border-none font-medium"
+                  style={{
+                    background: active ? color : `${color}18`,
+                    color: active ? '#fff' : color,
+                    boxShadow: active ? `0 2px 8px ${color}40` : 'none',
+                  }}
+                >
+                  {t} <span style={{ opacity: 0.6 }}>({count})</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Other tags */}
+      {otherTags.length > 0 && (
         <div className="mb-3">
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Tags</div>
           <div className="flex flex-wrap gap-1.5">
-            {allTags.map(t => {
+            {otherTags.map(t => {
               const count = papers.filter(p => (p.tags || []).includes(t)).length;
               const active = filterTag === t;
               return (
@@ -42,9 +78,10 @@ export default function FilterBar() {
         </div>
       )}
 
+      {/* Frequent keywords */}
       {topKeywords.length > 0 && (
         <div className="mb-2">
-          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Keywords</div>
+          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Keywords (2+)</div>
           <div className="flex flex-wrap gap-1.5">
             {topKeywords.map(({ keyword: k, count }) => {
               const active = filterKeyword === k;
