@@ -60,6 +60,7 @@ export default function NetworkGraph() {
 
   const [filterTag, setFilterTag] = useState(null);
   const [layout, setLayout] = useState('cose');
+  const [tooltip, setTooltip] = useState(null);
 
   const layoutOptions = {
     cose: {
@@ -100,6 +101,31 @@ export default function NetworkGraph() {
         setSelectedPaper(paper);
         setActiveTab('list');
       }
+    });
+
+    cy.on('mouseover', 'node', (evt) => {
+      const node = evt.target;
+      const nodeId = node.data('id');
+      const paper = papers.find(p => p.id === nodeId);
+      if (!paper) return;
+
+      const pos = node.renderedPosition();
+      const container = containerRef.current.getBoundingClientRect();
+
+      setTooltip({
+        x: container.left + pos.x,
+        y: container.top + pos.y - node.renderedHeight() / 2 - 8,
+        paper,
+        connections: node.degree(),
+      });
+    });
+
+    cy.on('mouseout', 'node', () => {
+      setTooltip(null);
+    });
+
+    cy.on('viewport', () => {
+      setTooltip(null);
     });
 
     cyRef.current = cy;
@@ -189,6 +215,38 @@ export default function NetworkGraph() {
         className="w-full border border-slate-200/80 rounded-xl bg-white shadow-sm"
         style={{ height: 'calc(100vh - 300px)', minHeight: 400 }}
       />
+
+      {/* Tooltip */}
+      {tooltip && (
+        <div
+          className="fixed z-50 bg-slate-900 text-white text-xs rounded-xl shadow-2xl pointer-events-none max-w-sm px-4 py-3"
+          style={{ left: tooltip.x, top: tooltip.y, transform: 'translate(-50%, -100%)' }}
+        >
+          <div className="font-semibold text-[13px] mb-1 leading-snug">{tooltip.paper.title}</div>
+          <div className="text-slate-300 mb-1.5">
+            {tooltip.paper.authors}{tooltip.paper.year && ` (${tooltip.paper.year})`}
+          </div>
+          {tooltip.paper.venue && (
+            <div className="text-slate-400 mb-1.5">{tooltip.paper.venue}</div>
+          )}
+          {tooltip.paper.abstract && (
+            <div className="text-slate-400 leading-relaxed line-clamp-3 mb-1.5">
+              {tooltip.paper.abstract}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-1 mt-1">
+            {(tooltip.paper.keywords || []).slice(0, 5).map((k, i) => (
+              <span key={i} className="text-[10px] bg-blue-500/20 text-blue-300 rounded px-1.5 py-0.5">{k}</span>
+            ))}
+            {(tooltip.paper.tags || []).slice(0, 3).map((t, i) => (
+              <span key={`t${i}`} className="text-[10px] bg-amber-500/20 text-amber-300 rounded px-1.5 py-0.5">{t}</span>
+            ))}
+          </div>
+          <div className="text-slate-500 mt-1.5 text-[10px]">
+            接続: {tooltip.connections}件 · クリックで詳細表示
+          </div>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-400">
