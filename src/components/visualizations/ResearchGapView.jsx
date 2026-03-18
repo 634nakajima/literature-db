@@ -11,7 +11,6 @@ export default function ResearchGapView() {
   const [view, setView] = useState('heatmap');
   const [topN, setTopN] = useState(15);
   const [hoverCell, setHoverCell] = useState(null);
-
   const allKeywords = useAllKeywords();
 
   if (allKeywords.length < 2) {
@@ -26,35 +25,37 @@ export default function ResearchGapView() {
     <div>
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <button
-          onClick={() => setView('heatmap')}
-          className={`text-xs px-3 py-1 rounded-md cursor-pointer transition-all border-none ${
-            view === 'heatmap' ? 'bg-blue-600 text-white font-medium' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          共起ヒートマップ
-        </button>
-        <button
-          onClick={() => setView('bubble')}
-          className={`text-xs px-3 py-1 rounded-md cursor-pointer transition-all border-none ${
-            view === 'bubble' ? 'bg-blue-600 text-white font-medium' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          カバレッジバブル
-        </button>
+        <div className="flex gap-1 bg-slate-100 rounded-lg p-0.5">
+          <button
+            onClick={() => setView('heatmap')}
+            className={`text-xs px-3 py-1.5 rounded-md cursor-pointer transition-all border-none ${
+              view === 'heatmap' ? 'bg-white text-slate-800 font-medium shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            共起ヒートマップ
+          </button>
+          <button
+            onClick={() => setView('bubble')}
+            className={`text-xs px-3 py-1.5 rounded-md cursor-pointer transition-all border-none ${
+              view === 'bubble' ? 'bg-white text-slate-800 font-medium shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            カバレッジバブル
+          </button>
+        </div>
 
         {view === 'heatmap' && (
           <div className="flex items-center gap-2 ml-2">
-            <span className="text-xs text-slate-500">上位</span>
+            <span className="text-xs text-slate-400">上位</span>
             <input
               type="range"
               min={5}
               max={Math.min(allKeywords.length, 25)}
               value={topN}
               onChange={e => setTopN(parseInt(e.target.value))}
-              className="w-20"
+              className="w-20 accent-blue-600"
             />
-            <span className="text-xs text-slate-500">{topN}件</span>
+            <span className="text-xs text-slate-500 font-medium">{topN}件</span>
           </div>
         )}
       </div>
@@ -62,16 +63,9 @@ export default function ResearchGapView() {
       {view === 'heatmap' ? (
         <HeatmapView papers={papers} topN={topN} hoverCell={hoverCell} setHoverCell={setHoverCell} />
       ) : (
-        <BubbleView
-          papers={papers}
-          onClickKeyword={(k) => {
-            setFilterKeyword(k);
-            setActiveTab('list');
-          }}
-        />
+        <BubbleView papers={papers} onClickKeyword={(k) => { setFilterKeyword(k); setActiveTab('list'); }} />
       )}
 
-      {/* Gaps suggestions */}
       <GapSuggestions papers={papers} topN={topN} />
     </div>
   );
@@ -84,51 +78,53 @@ function HeatmapView({ papers, topN, hoverCell, setHoverCell }) {
   );
 
   const n = keywords.length;
-  const cellSize = Math.min(40, Math.max(600 / n, 20));
-  const labelWidth = 100;
+  const cellSize = Math.min(36, Math.max(500 / n, 18));
+
+  // Calculate max label width to set proper margin
+  const labelMargin = 130;
   const size = n * cellSize;
 
   const maxVal = Math.max(...matrix.flat(), 1);
   const colorScale = (v) => {
     if (v === 0) return '#f8fafc';
     const t = v / maxVal;
-    return d3.interpolateBlues(0.2 + t * 0.7);
+    return d3.interpolateBlues(0.15 + t * 0.75);
   };
 
   return (
     <div className="overflow-auto">
       <svg
-        width={size + labelWidth + 20}
-        height={size + labelWidth + 20}
-        className="bg-white border border-slate-200 rounded-lg"
+        width={size + labelMargin + 30}
+        height={size + labelMargin + 30}
+        className="bg-white border border-slate-200/80 rounded-xl shadow-sm"
       >
-        <g transform={`translate(${labelWidth}, ${labelWidth})`}>
-          {/* Column labels */}
+        <g transform={`translate(${labelMargin}, ${labelMargin})`}>
+          {/* Column labels - rotated */}
           {keywords.map((k, i) => (
             <text
               key={`col-${i}`}
               x={i * cellSize + cellSize / 2}
-              y={-6}
-              textAnchor="end"
-              fontSize={9}
+              y={-8}
+              textAnchor="start"
+              fontSize={10}
               fill="#475569"
-              transform={`rotate(-45, ${i * cellSize + cellSize / 2}, -6)`}
+              transform={`rotate(-50, ${i * cellSize + cellSize / 2}, -8)`}
             >
-              {k.length > 12 ? k.slice(0, 12) + '…' : k}
+              {k}
             </text>
           ))}
 
-          {/* Row labels */}
+          {/* Row labels - full text, right-aligned */}
           {keywords.map((k, i) => (
             <text
               key={`row-${i}`}
-              x={-6}
+              x={-8}
               y={i * cellSize + cellSize / 2 + 3}
               textAnchor="end"
-              fontSize={9}
+              fontSize={10}
               fill="#475569"
             >
-              {k.length > 12 ? k.slice(0, 12) + '…' : k}
+              {k}
             </text>
           ))}
 
@@ -142,18 +138,14 @@ function HeatmapView({ papers, topN, hoverCell, setHoverCell }) {
                   width={cellSize - 1}
                   height={cellSize - 1}
                   fill={colorScale(val)}
-                  stroke={
-                    hoverCell && hoverCell.i === i && hoverCell.j === j
-                      ? '#2563eb'
-                      : '#e2e8f0'
-                  }
+                  stroke={hoverCell && hoverCell.i === i && hoverCell.j === j ? '#2563eb' : '#e2e8f0'}
                   strokeWidth={hoverCell && hoverCell.i === i && hoverCell.j === j ? 2 : 0.5}
-                  rx={2}
-                  className="cursor-pointer"
+                  rx={3}
+                  className="cursor-pointer transition-colors"
                   onMouseEnter={() => setHoverCell({ i, j, val, kw1: keywords[i], kw2: keywords[j] })}
                   onMouseLeave={() => setHoverCell(null)}
                 />
-                {cellSize >= 25 && val > 0 && (
+                {cellSize >= 24 && val > 0 && (
                   <text
                     x={j * cellSize + cellSize / 2}
                     y={i * cellSize + cellSize / 2 + 3}
@@ -161,6 +153,7 @@ function HeatmapView({ papers, topN, hoverCell, setHoverCell }) {
                     fontSize={9}
                     fill={val / maxVal > 0.5 ? '#fff' : '#475569'}
                     pointerEvents="none"
+                    fontWeight={500}
                   >
                     {val}
                   </text>
@@ -173,31 +166,27 @@ function HeatmapView({ papers, topN, hoverCell, setHoverCell }) {
 
       {/* Hover info */}
       {hoverCell && (
-        <div className="mt-2 text-sm text-slate-600 bg-white border border-slate-200 rounded-md px-3 py-2 inline-block">
+        <div className="mt-3 text-sm text-slate-600 bg-white border border-slate-200 rounded-lg px-4 py-2.5 inline-block shadow-sm">
           <span className="font-semibold">{hoverCell.kw1}</span>
           {' × '}
           <span className="font-semibold">{hoverCell.kw2}</span>
           {': '}
-          <span className={hoverCell.val === 0 ? 'text-red-500 font-semibold' : 'text-blue-600'}>
+          <span className={hoverCell.val === 0 ? 'text-red-500 font-semibold' : 'text-blue-600 font-medium'}>
             {hoverCell.val === 0 ? '未探索（ギャップ）' : `${hoverCell.val}件`}
           </span>
         </div>
       )}
 
       {/* Legend */}
-      <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+      <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
         <span>少</span>
-        <div className="flex">
+        <div className="flex rounded overflow-hidden">
           {[0, 0.2, 0.4, 0.6, 0.8, 1].map((t, i) => (
-            <div
-              key={i}
-              className="w-5 h-3"
-              style={{ background: t === 0 ? '#f8fafc' : d3.interpolateBlues(0.2 + t * 0.7) }}
-            />
+            <div key={i} className="w-6 h-3" style={{ background: t === 0 ? '#f8fafc' : d3.interpolateBlues(0.15 + t * 0.75) }} />
           ))}
         </div>
         <span>多</span>
-        <span className="ml-2">薄い色 = 研究の空白</span>
+        <span className="ml-3 text-slate-500">白 = 研究の空白（ギャップ）</span>
       </div>
     </div>
   );
@@ -205,9 +194,20 @@ function HeatmapView({ papers, topN, hoverCell, setHoverCell }) {
 
 function BubbleView({ papers, onClickKeyword }) {
   const svgRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 600, height: 500 });
+  const containerRef = useRef(null);
+  const [width, setWidth] = useState(600);
+  const height = 500;
 
   const bubbleData = useMemo(() => buildBubbleData(papers), [papers]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const obs = new ResizeObserver(entries => {
+      setWidth(Math.max(entries[0].contentRect.width, 300));
+    });
+    obs.observe(containerRef.current);
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!svgRef.current || bubbleData.length === 0) return;
@@ -215,23 +215,17 @@ function BubbleView({ papers, onClickKeyword }) {
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
-    const width = dimensions.width;
-    const height = dimensions.height;
-
     const maxCount = Math.max(...bubbleData.map(d => d.count), 1);
     const radiusScale = d3.scaleSqrt().domain([1, maxCount]).range([15, 50]);
 
     const colorScale = (count) => {
       const t = count / maxCount;
-      if (t > 0.5) return '#16a34a'; // green - well covered
-      if (t > 0.2) return '#ca8a04'; // yellow - moderate
-      return '#ea580c'; // orange - gap
+      if (t > 0.5) return '#16a34a';
+      if (t > 0.2) return '#ca8a04';
+      return '#ea580c';
     };
 
-    const nodes = bubbleData.map(d => ({
-      ...d,
-      r: radiusScale(d.count),
-    }));
+    const nodes = bubbleData.map(d => ({ ...d, r: radiusScale(d.count) }));
 
     const simulation = d3.forceSimulation(nodes)
       .force('charge', d3.forceManyBody().strength(5))
@@ -242,8 +236,7 @@ function BubbleView({ papers, onClickKeyword }) {
     const g = svg.append('g');
 
     const nodeGroups = g.selectAll('g')
-      .data(nodes)
-      .join('g')
+      .data(nodes).join('g')
       .attr('cursor', 'pointer')
       .on('click', (_, d) => onClickKeyword(d.keyword));
 
@@ -253,10 +246,10 @@ function BubbleView({ papers, onClickKeyword }) {
       .attr('opacity', 0.75)
       .attr('stroke', d => colorScale(d.count))
       .attr('stroke-width', 2)
-      .attr('stroke-opacity', 0.3);
+      .attr('stroke-opacity', 0.25);
 
     nodeGroups.append('text')
-      .text(d => d.keyword.length > 10 ? d.keyword.slice(0, 10) + '…' : d.keyword)
+      .text(d => d.keyword.length > 12 ? d.keyword.slice(0, 12) + '…' : d.keyword)
       .attr('text-anchor', 'middle')
       .attr('dy', '-0.2em')
       .attr('font-size', d => Math.min(d.r * 0.35, 11))
@@ -278,42 +271,22 @@ function BubbleView({ papers, onClickKeyword }) {
     }
 
     return () => simulation.stop();
-  }, [bubbleData, dimensions]);
-
-  // Observe container width
-  const containerRef = useRef(null);
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const obs = new ResizeObserver(entries => {
-      const { width } = entries[0].contentRect;
-      setDimensions(d => ({ ...d, width: Math.max(width, 300) }));
-    });
-    obs.observe(containerRef.current);
-    return () => obs.disconnect();
-  }, []);
+  }, [bubbleData, width]);
 
   return (
     <div ref={containerRef}>
-      <p className="text-xs text-slate-400 mb-2">
-        バブルをクリックでそのキーワードの文献一覧を表示 / 緑=充実、オレンジ=少ない
-      </p>
-      <svg
-        ref={svgRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        className="bg-white border border-slate-200 rounded-lg"
-      />
-      {/* Legend */}
-      <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
-        <span className="flex items-center gap-1">
+      <p className="text-xs text-slate-400 mb-2">バブルをクリックでそのキーワードの文献一覧へ</p>
+      <svg ref={svgRef} width={width} height={height} className="bg-white border border-slate-200/80 rounded-xl shadow-sm" />
+      <div className="mt-3 flex items-center gap-5 text-xs text-slate-400">
+        <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full inline-block" style={{ background: '#ea580c' }} />
           少ない（ギャップ候補）
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full inline-block" style={{ background: '#ca8a04' }} />
           中程度
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full inline-block" style={{ background: '#16a34a' }} />
           充実
         </span>
@@ -324,27 +297,21 @@ function BubbleView({ papers, onClickKeyword }) {
 
 function GapSuggestions({ papers, topN }) {
   const gaps = useMemo(() => findGaps(papers, topN), [papers, topN]);
-
   if (gaps.length === 0) return null;
 
   return (
-    <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-      <h4 className="text-sm font-bold text-amber-900 mb-2">
+    <div className="mt-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-xl p-5">
+      <h4 className="text-sm font-bold text-amber-900 mb-3">
         研究ギャップの候補（共起ゼロのキーワードペア）
       </h4>
       <div className="flex flex-wrap gap-1.5">
         {gaps.slice(0, 20).map((g, i) => (
-          <span
-            key={i}
-            className="text-xs bg-white border border-amber-300 rounded-full px-2.5 py-1 text-amber-800"
-          >
+          <span key={i} className="text-[11px] bg-white/80 border border-amber-200/60 rounded-lg px-2.5 py-1 text-amber-800">
             {g.a} × {g.b}
           </span>
         ))}
         {gaps.length > 20 && (
-          <span className="text-xs text-amber-600">
-            他 {gaps.length - 20}件
-          </span>
+          <span className="text-[11px] text-amber-600 self-center ml-1">他 {gaps.length - 20}件</span>
         )}
       </div>
     </div>
