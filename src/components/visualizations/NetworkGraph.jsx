@@ -1,8 +1,34 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import cytoscape from 'cytoscape';
 import usePaperStore from '../../store/usePaperStore';
 import { useAllTags } from '../../hooks/usePaperData';
 import { buildNetworkElements, getTagColor, LAB_THEMES } from '../../lib/graphUtils';
+
+// Clamp tooltip position so it doesn't overflow the viewport
+function clampTooltipStyle(x, y, tooltipEl) {
+  const pad = 12;
+  const style = { position: 'fixed', zIndex: 50 };
+
+  if (!tooltipEl) {
+    return { ...style, left: x, top: y, transform: 'translate(-50%, -100%)' };
+  }
+
+  const rect = tooltipEl.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let left = x - rect.width / 2;
+  let top = y - rect.height;
+
+  // Clamp horizontal
+  if (left < pad) left = pad;
+  if (left + rect.width > vw - pad) left = vw - pad - rect.width;
+
+  // If tooltip would go above viewport, show below the node instead
+  if (top < pad) top = y + 20;
+
+  return { ...style, left, top };
+}
 
 const cyStyle = [
   {
@@ -61,6 +87,7 @@ export default function NetworkGraph() {
   const [filterTag, setFilterTag] = useState(null);
   const [layout, setLayout] = useState('cose');
   const [tooltip, setTooltip] = useState(null);
+  const tooltipRef = useRef(null);
 
   const layoutOptions = {
     cose: {
@@ -219,8 +246,9 @@ export default function NetworkGraph() {
       {/* Tooltip */}
       {tooltip && (
         <div
-          className="fixed z-50 bg-slate-900 text-white text-xs rounded-xl shadow-2xl pointer-events-none max-w-sm px-4 py-3"
-          style={{ left: tooltip.x, top: tooltip.y, transform: 'translate(-50%, -100%)' }}
+          ref={tooltipRef}
+          className="bg-slate-900 text-white text-xs rounded-xl shadow-2xl pointer-events-none max-w-sm px-4 py-3"
+          style={clampTooltipStyle(tooltip.x, tooltip.y, tooltipRef.current)}
         >
           <div className="font-semibold text-[13px] mb-1 leading-snug">{tooltip.paper.title}</div>
           <div className="text-slate-300 mb-1.5">
