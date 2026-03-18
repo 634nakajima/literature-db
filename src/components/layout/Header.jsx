@@ -1,5 +1,4 @@
 import usePaperStore from '../../store/usePaperStore';
-import HeartLogo from './HeartLogo';
 
 export default function Header() {
   const exportPapers = usePaperStore(s => s.exportPapers);
@@ -8,7 +7,11 @@ export default function Header() {
   return (
     <header className="header-accent text-white px-6 py-5 flex items-center justify-between border-b border-slate-700/50">
       <div className="flex items-center gap-3">
-        <HeartLogo size={36} />
+        <img
+          src={`${import.meta.env.BASE_URL}logo.png`}
+          alt="Lab Logo"
+          className="w-9 h-9 rounded-lg"
+        />
         <div>
           <h1 className="text-base font-bold tracking-wide leading-tight">
             Affective Information Media Lab.
