@@ -182,8 +182,8 @@ export default function NetworkGraph() {
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <div className="flex gap-1 bg-slate-100 rounded-lg p-0.5">
           {[
-            { key: 'cose', label: 'Force' },
             { key: 'circle', label: 'Circle' },
+            { key: 'cose', label: 'Force' },
             { key: 'grid', label: 'Grid' },
           ].map(l => (
             <button
