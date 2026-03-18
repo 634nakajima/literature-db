@@ -48,7 +48,7 @@ export function buildNetworkElements(papers, filterTag = null) {
         year: p.year,
         authors: p.authors,
         color: primaryTag ? getTagColor(primaryTag, allTags) : '#94a3b8',
-        size: 30,
+        size: 8,
       },
     };
   });
@@ -84,7 +84,7 @@ export function buildNetworkElements(papers, filterTag = null) {
   });
   nodes.forEach(n => {
     const degree = degreeCounts[n.data.id] || 0;
-    n.data.size = 20 + degree * 5;
+    n.data.size = 8 + Math.min(degree, 6) * 2;
   });
 
   return { nodes, edges };
