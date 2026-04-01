@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import usePaperStore from './store/usePaperStore';
 import { EMPTY, toForm } from './lib/helpers';
+import useHistorySync from './hooks/useHistorySync';
 import PasswordGate from './components/layout/PasswordGate';
 import Header from './components/layout/Header';
 import TabNav from './components/layout/TabNav';
@@ -26,6 +27,9 @@ export default function App() {
 
   const [form, setForm] = useState({ ...EMPTY });
   const [editMode, setEditMode] = useState(false);
+
+  // ブラウザ履歴とタブ/論文選択状態を同期
+  useHistorySync();
 
   // Fetch papers on mount
   useEffect(() => {
