@@ -9,9 +9,6 @@ import PaperList from './components/papers/PaperList';
 import PaperForm from './components/papers/PaperForm';
 import SearchView from './components/search/SearchView';
 import ImportExportView from './components/import-export/ImportExportView';
-import NetworkGraph from './components/visualizations/NetworkGraph';
-import TimelineView from './components/visualizations/TimelineView';
-import ResearchGapView from './components/visualizations/ResearchGapView';
 
 export default function App() {
   const activeTab = usePaperStore(s => s.activeTab);
@@ -107,9 +104,6 @@ export default function App() {
         )}
 
         {activeTab === 'search' && <SearchView />}
-        {activeTab === 'network' && <NetworkGraph />}
-        {activeTab === 'timeline' && <TimelineView />}
-        {activeTab === 'gaps' && <ResearchGapView />}
         {activeTab === 'import' && <ImportExportView />}
       </main>
     </div>

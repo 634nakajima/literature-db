@@ -62,6 +62,33 @@ export function matchesQuery(paper, q) {
   ].some(f => f && f.toLowerCase().includes(lower));
 }
 
+// Lab research themes (fixed categories)
+export const LAB_THEMES = [
+  'Multimodal/Crossmodal Affectivity',
+  'Enactive Affectivity',
+  'Digital Kineticism',
+  'Hapsonic Art',
+];
+
+const THEME_COLORS = {
+  'Multimodal/Crossmodal Affectivity': '#6366f1',
+  'Enactive Affectivity': '#ec4899',
+  'Digital Kineticism': '#14b8a6',
+  'Hapsonic Art': '#f59e0b',
+};
+
+const EXTRA_COLORS = [
+  '#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c',
+  '#0891b2', '#c026d3', '#4f46e5', '#059669', '#ca8a04',
+];
+
+export function getTagColor(tag, allTags) {
+  if (THEME_COLORS[tag]) return THEME_COLORS[tag];
+  const nonThemeTags = allTags.filter(t => !THEME_COLORS[t]);
+  const idx = nonThemeTags.indexOf(tag);
+  return EXTRA_COLORS[idx >= 0 ? idx % EXTRA_COLORS.length : 0];
+}
+
 export function isDuplicate(existing, p) {
   return existing.some(e =>
     (e.title && p.title && e.title.toLowerCase() === p.title.toLowerCase()) ||

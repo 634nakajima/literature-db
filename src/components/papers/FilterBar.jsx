@@ -1,6 +1,6 @@
 import usePaperStore from '../../store/usePaperStore';
 import { useAllTags, useAllKeywords } from '../../hooks/usePaperData';
-import { LAB_THEMES, getTagColor } from '../../lib/graphUtils';
+import { LAB_THEMES, getTagColor } from '../../lib/helpers';
 
 export default function FilterBar() {
   const papers = usePaperStore(s => s.papers);

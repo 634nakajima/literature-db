@@ -4,9 +4,6 @@ const TABS = [
   { id: 'list', label: '一覧', icon: '☰' },
   { id: 'add', label: '追加', icon: '+' },
   { id: 'search', label: '検索', icon: '⌕' },
-  { id: 'network', label: 'ネットワーク', icon: '◎' },
-  { id: 'timeline', label: 'タイムライン', icon: '―' },
-  { id: 'gaps', label: 'ギャップ', icon: '▦' },
   { id: 'import', label: 'インポート', icon: '↓' },
 ];
 
