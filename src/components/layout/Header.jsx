@@ -2,11 +2,18 @@ import usePaperStore from '../../store/usePaperStore';
 
 export default function Header() {
   const exportPapers = usePaperStore(s => s.exportPapers);
+  const setActiveTab = usePaperStore(s => s.setActiveTab);
+  const setSelectedPaper = usePaperStore(s => s.setSelectedPaper);
   const paperCount = usePaperStore(s => s.papers.length);
+
+  const handleLogoClick = () => {
+    setSelectedPaper(null);
+    setActiveTab('list');
+  };
 
   return (
     <header className="header-accent text-white px-6 py-5 flex items-center justify-between border-b border-slate-700/50">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 cursor-pointer" onClick={handleLogoClick}>
         <img
           src={`${import.meta.env.BASE_URL}logo.png`}
           alt="Lab Logo"
