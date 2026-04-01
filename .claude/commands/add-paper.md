@@ -32,7 +32,12 @@ curl -s "https://ygnmlkgfrlfvgfpfkkbj.supabase.co/rest/v1/papers" \
 環境変数 `SUPABASE_ANON_KEY` が未設定の場合は以下の値を使用:
 `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnbm1sa2dmcmxmdmdmcGZra2JqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjUyMTUsImV4cCI6MjA4OTI0MTIxNX0.GHIMAC8E5JQj-YhXeqi_0EHnCctnXYhEBPwuOqrpzOE`
 
-3. レスポンスを確認し、追加された文献情報をユーザーに報告する
+3. Web検索などで論文の内容を調査し、`notes` フィールドに**1000字以上の日本語**で詳細な解説を記述する。以下の観点を含めること：
+   - 研究の背景・問題意識
+   - 提案手法・概念の詳細説明
+   - 実験・評価の概要（あれば）
+   - 研究上の意義と関連研究との位置づけ
+4. レスポンスを確認し、追加された文献情報をユーザーに報告する
 
 ## 複数件追加
 
