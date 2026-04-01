@@ -5,12 +5,25 @@ export function useFilteredPapers() {
   const papers = usePaperStore(s => s.papers);
   const filterTag = usePaperStore(s => s.filterTag);
   const filterKeyword = usePaperStore(s => s.filterKeyword);
+  const sortBy = usePaperStore(s => s.sortBy);
 
   return useMemo(() => {
-    return papers
+    const filtered = papers
       .filter(p => !filterTag || (p.tags || []).includes(filterTag))
       .filter(p => !filterKeyword || (p.keywords || []).includes(filterKeyword));
-  }, [papers, filterTag, filterKeyword]);
+
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'year_desc':
+          return (b.year || 0) - (a.year || 0);
+        case 'year_asc':
+          return (a.year || 0) - (b.year || 0);
+        case 'added_desc':
+        default:
+          return (b.added_at || '').localeCompare(a.added_at || '');
+      }
+    });
+  }, [papers, filterTag, filterKeyword, sortBy]);
 }
 
 export function useAllTags() {

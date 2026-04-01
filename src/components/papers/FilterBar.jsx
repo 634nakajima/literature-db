@@ -8,6 +8,8 @@ export default function FilterBar() {
   const filterKeyword = usePaperStore(s => s.filterKeyword);
   const setFilterTag = usePaperStore(s => s.setFilterTag);
   const setFilterKeyword = usePaperStore(s => s.setFilterKeyword);
+  const sortBy = usePaperStore(s => s.sortBy);
+  const setSortBy = usePaperStore(s => s.setSortBy);
   const clearFilters = usePaperStore(s => s.clearFilters);
   const allTags = useAllTags();
   const allKeywords = useAllKeywords();
@@ -22,6 +24,20 @@ export default function FilterBar() {
 
   return (
     <div className="mb-5 bg-white/60 rounded-xl p-4 border border-slate-100">
+      {/* Sort */}
+      <div className="mb-3 flex items-center gap-2">
+        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Sort</span>
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value)}
+          className="text-xs px-2 py-1 rounded-lg border border-slate-200 bg-white text-slate-600 cursor-pointer"
+        >
+          <option value="added_desc">登録日（新しい順）</option>
+          <option value="year_desc">出版年（新しい順）</option>
+          <option value="year_asc">出版年（古い順）</option>
+        </select>
+      </div>
+
       {/* Lab themes */}
       {labThemeTags.length > 0 && (
         <div className="mb-3">

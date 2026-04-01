@@ -11,6 +11,7 @@ const usePaperStore = create(
       selectedPaper: null,
       filterTag: null,
       filterKeyword: null,
+      sortBy: 'added_desc',
       loading: true,
       error: null,
       success: null,
@@ -28,6 +29,8 @@ const usePaperStore = create(
       setFilterKeyword: (keyword) => set(state => ({
         filterKeyword: state.filterKeyword === keyword ? null : keyword,
       })),
+
+      setSortBy: (sortBy) => set({ sortBy }),
 
       clearFilters: () => set({ filterTag: null, filterKeyword: null }),
 
