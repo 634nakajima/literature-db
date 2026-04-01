@@ -54,6 +54,21 @@ Web検索（semanticSearch等）で論文情報を見つけた場合、その情
 - `keywords` と `tags` はTEXT配列として送信する（`["a", "b"]` 形式）
 - 重複チェックはサーバー側では行わないため、追加前にタイトルやDOIで既存データを確認すること
 
+## タグ付けの指針
+
+以下のタグ体系に従って付与すること：
+
+| タグ | 意味 |
+|------|------|
+| `Multimodal/Crossmodal Affectivity` | マルチモーダルまたはクロスモーダルな感情・感覚研究全般 |
+| `Crossmodal Affectivity` | クロスモーダル（感覚間）な感情・知覚研究 |
+| `Enactive Affectivity` | エナクティヴィズムに基づく感情・身体性研究 |
+| `Hapsonic Art` | 触覚と音響を組み合わせたアート・インタフェース研究 |
+| `Digital Kineticism` | デジタル運動感覚・動きに関する研究 |
+
+**重要ルール：`Crossmodal Affectivity` タグを付ける場合は、必ず `Multimodal/Crossmodal Affectivity` タグも同時に付けること。**
+（`Multimodal/Crossmodal Affectivity` は「multimodal affectivity または crossmodal affectivity」を意味する上位タグのため）
+
 ## 重複確認
 
 追加前に既存データを確認するには:
