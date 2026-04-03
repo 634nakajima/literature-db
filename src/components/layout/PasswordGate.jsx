@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const HASH = '513d0089f96e49859ffb71ddca713fa56120057c9d7fd48631ebf15ffdaa4bc0';
+const HASH = 'af7a89b86d64271301d67812bc304ae55ded3c4835abdbd0a9221ef8a57af25d';
 const STORAGE_KEY = 'literature-db-auth';
 
 async function sha256(text) {
